@@ -1,0 +1,78 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Academic Presentation" : {
+
+    },
+    "Automatic" : {
+
+    },
+    "Business" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Casual" : {
+
+    },
+    "Clear" : {
+
+    },
+    "Download" : {
+
+    },
+    "Educational Casual" : {
+
+    },
+    "English to Japanese" : {
+
+    },
+    "Formal" : {
+
+    },
+    "Japanese to English" : {
+
+    },
+    "Journalistic" : {
+
+    },
+    "Loading…" : {
+
+    },
+    "Mode" : {
+
+    },
+    "Model is not available yet." : {
+
+    },
+    "NSFW" : {
+
+    },
+    "Paste" : {
+
+    },
+    "Slang" : {
+
+    },
+    "Social Network Casual" : {
+
+    },
+    "Style" : {
+
+    },
+    "Technical" : {
+
+    },
+    "Translate" : {
+
+    },
+    "Use as source text" : {
+
+    },
+    "Web Fiction" : {
+
+    }
+  },
+  "version" : "1.0"
+}
