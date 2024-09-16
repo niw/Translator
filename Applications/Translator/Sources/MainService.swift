@@ -13,6 +13,14 @@ private enum Error: Swift.Error {
     case failed(reason: String)
 }
 
+private final class Box<T> {
+    var value: T
+
+    init(_ value: T) {
+        self.value = value
+    }
+}
+
 @MainActor
 @Observable
 final class MainService {
@@ -23,8 +31,6 @@ final class MainService {
     var sourceString: String = ""
 
     var translatedString: String = ""
-
-    private(set) var isTranslating: Bool = false
 
     let cachedTranslatorModel = CachedModel(source: ModelSource.default)
 
@@ -64,25 +70,36 @@ final class MainService {
         }
     }
 
-    @ObservationIgnored
-    private var translationTask: Task<Void, any Swift.Error>?
+    private var translationTask: Box<Task<Void, any Swift.Error>>?
+
+    public var isTranslating: Bool {
+        translationTask != nil
+    }
 
     func translate() async throws {
-        let previousTranslationTask = translationTask
+        let previousTask = translationTask
 
         let sourceString = sourceString
         let mode = mode
         let style = style
 
-        translationTask = Task { [weak self] in
+        var task: Box<Task<Void, any Swift.Error>>?
+        task = Box(Task { [weak self] in
             guard let self else {
                 return
             }
 
-            if let previousTranslationTask {
+            defer {
+                // Reentrant
+                if let task, translationTask === task {
+                    translationTask = nil
+                }
+            }
+
+            if let previousTask {
                 do {
-                    previousTranslationTask.cancel()
-                    try await previousTranslationTask.value
+                    previousTask.value.cancel()
+                    try await previousTask.value.value
                 } catch {
                 }
             }
@@ -95,17 +112,12 @@ final class MainService {
 
             translatedString = ""
 
-            isTranslating = true
-            defer {
-                // Reentrant
-                isTranslating = false
-            }
-
             let translator = try await translatorLoadingTask.value
 
             for try await output in translator.translate(sourceString, mode: mode, style: style) {
                 translatedString.append(output)
             }
-        }
+        })
+        translationTask = task
     }
 }
