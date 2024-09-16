@@ -1,5 +1,5 @@
 //
-//  MainService.swift
+//  TranslatorService.swift
 //  Translator
 //
 //  Created by Yoshimasa Niwa on 9/3/24.
@@ -7,7 +7,6 @@
 
 import Foundation
 import Observation
-import TranslatorSupport
 
 private enum Error: Swift.Error {
     case failed(reason: String)
@@ -23,26 +22,30 @@ private final class Box<T> {
 
 @MainActor
 @Observable
-final class MainService {
-    var mode: Translator.Mode = .automatic
+public final class TranslatorService {
+    public var mode: Translator.Mode = .automatic
 
-    var style: Translator.Style = .technical
+    public var style: Translator.Style = .technical
 
-    var sourceString: String = ""
+    public var sourceString: String = ""
 
-    var translatedString: String = ""
+    public var translatedString: String = ""
 
-    let cachedTranslatorModel = CachedModel(source: ModelSource.default)
+    public let model: CachedModel
+
+    public init(modelSource: ModelSource = .default) {
+        model = CachedModel(source: modelSource)
+    }
 
     private var translatorLoadingTask: Task<Translator, any Swift.Error>?
 
-    func preloadModel() {
+    public func preloadModel() {
         do {
-            try cachedTranslatorModel.update()
+            try model.update()
         } catch {
         }
 
-        guard case .available(let url) = cachedTranslatorModel.state else {
+        guard case .available(let url) = model.state else {
             return
         }
 
@@ -51,19 +54,19 @@ final class MainService {
         }
     }
 
-    func downloadModel() {
+    public func downloadModel() {
         do {
-            try cachedTranslatorModel.update()
+            try model.update()
         } catch {
         }
 
-        guard case .unavailable = cachedTranslatorModel.state else {
+        guard case .unavailable = model.state else {
             return
         }
 
         Task {
             do {
-                try await cachedTranslatorModel.download()
+                try await model.download()
                 preloadModel()
             } catch {
             }
@@ -76,7 +79,7 @@ final class MainService {
         translationTask != nil
     }
 
-    func translate() async throws {
+    public func translate() async throws {
         let previousTask = translationTask
 
         let sourceString = sourceString

@@ -7,10 +7,11 @@
 
 import AppKit
 import Foundation
+import TranslatorSupport
 
 @MainActor
 final class AppDelegate: NSObject {
-    let mainService: MainService = MainService()
+    var translatorService: TranslatorService = TranslatorService()
 
     var localizedName: String {
         for case let infoDictionary? in [
@@ -45,9 +46,9 @@ final class AppDelegate: NSObject {
 
 extension AppDelegate: NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
-        NSApplication.shared.servicesProvider = ServiceProvider(mainService: mainService)
+        NSApplication.shared.servicesProvider = ServiceProvider(translatorService: translatorService)
         NSUpdateDynamicServices()
 
-        mainService.preloadModel()
+        translatorService.preloadModel()
     }
 }

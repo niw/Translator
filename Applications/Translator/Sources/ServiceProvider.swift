@@ -7,13 +7,14 @@
 
 import AppKit
 import Foundation
+import TranslatorSupport
 
 @MainActor
 final class ServiceProvider: NSObject {
-    private let mainService: MainService
+    private let translatorService: TranslatorService
 
-    init(mainService: MainService) {
-        self.mainService = mainService
+    init(translatorService: TranslatorService) {
+        self.translatorService = translatorService
     }
 
     @objc
@@ -21,10 +22,10 @@ final class ServiceProvider: NSObject {
         guard let string = pasteboard.string(forType: .string) else {
             return
         }
-        mainService.sourceString = string
+        translatorService.sourceString = string
         Task {
             do {
-                try await mainService.translate()
+                try await translatorService.translate()
             } catch {
             }
         }

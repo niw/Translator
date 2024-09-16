@@ -54,7 +54,7 @@ public final class CachedModel {
 
     public let source: ModelSource
 
-    public init(source: ModelSource) {
+    init(source: ModelSource) {
         self.source = source
     }
 

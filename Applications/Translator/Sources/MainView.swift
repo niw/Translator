@@ -52,21 +52,21 @@ private extension Translator.Style {
 }
 
 struct MainView: View {
-    @Environment(MainService.self)
-    private var mainService
+    @Environment(TranslatorService.self)
+    private var translatorService
 
     var body: some View {
-        let mainServiceBindable = Bindable(mainService)
+        let translatorServiceBindable = Bindable(translatorService)
 
         VStack {
-            switch mainService.cachedTranslatorModel.state {
+            switch translatorService.model.state {
             case .available:
                 EmptyView()
             case .unavailable:
                 HStack {
                     Text("Model is not available yet.")
                     Button("Download") {
-                        mainService.downloadModel()
+                        translatorService.downloadModel()
                     }
                 }
                 .scenePadding()
@@ -85,7 +85,7 @@ struct MainView: View {
             }
 
             HStack {
-                Picker(selection: mainServiceBindable.mode) {
+                Picker(selection: translatorServiceBindable.mode) {
                     ForEach(Translator.Mode.allCases, id: \.rawValue) { mode in
                         Text(mode.localizedStringKey)
                             .tag(mode)
@@ -95,7 +95,7 @@ struct MainView: View {
                 }
                 .fixedSize()
 
-                Picker(selection: mainServiceBindable.style) {
+                Picker(selection: translatorServiceBindable.style) {
                     ForEach(Translator.Style.allCases, id: \.rawValue) { style in
                         Text(style.localizedStringKey)
                             .tag(style)
@@ -108,8 +108,8 @@ struct MainView: View {
             .scenePadding()
 
             HStack {
-                TextEditor(text: mainServiceBindable.sourceString)
-                TextEditor(text: .constant(mainService.translatedString))
+                TextEditor(text: translatorServiceBindable.sourceString)
+                TextEditor(text: .constant(translatorService.translatedString))
             }
             .font(.system(size: 16.0))
 
@@ -117,35 +117,35 @@ struct MainView: View {
                 HStack {
                     Button("Paste") {
                         if let string = NSPasteboard.general.string(forType: .string) {
-                            mainService.sourceString = string
+                            translatorService.sourceString = string
                         }
                     }
 
                     Button("Clear") {
-                        mainService.sourceString = ""
-                        mainService.translatedString = ""
+                        translatorService.sourceString = ""
+                        translatorService.translatedString = ""
                     }
 
                     Button("Translate") {
                         Task {
                             do {
-                                try await mainService.translate()
+                                try await translatorService.translate()
                             } catch {
                             }
                         }
                     }
                     .buttonStyle(.borderedProminent)
-                    .disabled(mainService.sourceString.isEmpty)
+                    .disabled(translatorService.sourceString.isEmpty)
 
                     Button("Use as source text") {
-                        mainService.sourceString = mainService.translatedString
+                        translatorService.sourceString = translatorService.translatedString
                     }
                 }
 
                 HStack {
                     Spacer()
 
-                    if mainService.isTranslating {
+                    if translatorService.isTranslating {
                         ProgressView()
                             .progressViewStyle(.circular)
                             .controlSize(.small)
