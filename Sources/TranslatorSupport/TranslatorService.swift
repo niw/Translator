@@ -1,6 +1,6 @@
 //
 //  TranslatorService.swift
-//  Translator
+//  TranslatorSupport
 //
 //  Created by Yoshimasa Niwa on 9/3/24.
 //

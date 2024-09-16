@@ -1,6 +1,6 @@
 //
 //  FileManagerExtension.swift
-//  Translator
+//  TranslatorSupport
 //
 //  Created by Yoshimasa Niwa on 8/18/24.
 //

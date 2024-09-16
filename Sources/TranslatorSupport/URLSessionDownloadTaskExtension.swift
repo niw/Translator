@@ -1,6 +1,6 @@
 //
 //  URLSessionDownloadTaskExtension.swift
-//  ResourceBundle
+//  TranslatorSupport
 //
 //  Created by Yoshimasa Niwa on 9/4/24.
 //

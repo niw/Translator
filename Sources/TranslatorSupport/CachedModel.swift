@@ -1,6 +1,6 @@
 //
 //  CachedModel.swift
-//  Translator
+//  TranslatorSupport
 //
 //  Created by Yoshimasa Niwa on 8/27/24.
 //

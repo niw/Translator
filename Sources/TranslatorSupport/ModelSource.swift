@@ -1,6 +1,6 @@
 //
 //  ModelSource.swift
-//  Translator
+//  TranslatorSupport
 //
 //  Created by Yoshimasa Niwa on 8/30/24.
 //
