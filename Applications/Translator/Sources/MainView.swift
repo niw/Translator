@@ -134,6 +134,8 @@ struct MainView: View {
             .scenePadding()
         }
         .onAppear {
+            translatorService.updateModel()
+
             if case .unavailable = translatorService.modelState {
                 openSettings()
             }

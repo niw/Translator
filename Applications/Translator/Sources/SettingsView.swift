@@ -79,6 +79,9 @@ struct ModelSettingsView: View {
             }
         }
         .frame(width: 500.0)
+        .onAppear {
+            translatorService.updateModel()
+        }
     }
 }
 

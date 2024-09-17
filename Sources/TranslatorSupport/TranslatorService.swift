@@ -46,6 +46,13 @@ public final class TranslatorService {
 
     private var translatorLoadingTask: Task<Translator, any Swift.Error>?
 
+    public func updateModel() {
+        do {
+            try model.update()
+        } catch {
+        }
+    }
+
     public func preloadModel() {
         do {
             try model.update()
