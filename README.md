@@ -5,7 +5,7 @@ A simple macOS app that translates Japanese to English, or English to Japanese
 naturally by using [webbigdata/C3TR-Adapter_gguf](https://huggingface.co/webbigdata/C3TR-Adapter_gguf)
 locally.
 
-The app can be tirggered by regular Service on macOS with shortcut key.
+The app can be triggered by regular Service on macOS with shortcut key.
 
 
 Usage
@@ -27,7 +27,7 @@ Open `Applications/Translator.xcodeproj` and build `Translator`
 scheme for running.
 
 
-Rerefences
+References
 ----------
 
 - [webbigdata/C3TR-Adapter_gguf](https://huggingface.co/webbigdata/C3TR-Adapter_gguf)
