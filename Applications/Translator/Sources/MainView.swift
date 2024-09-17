@@ -61,30 +61,7 @@ struct MainView: View {
     var body: some View {
         let translatorServiceBindable = Bindable(translatorService)
 
-        VStack {
-            HStack {
-                Picker(selection: translatorServiceBindable.mode) {
-                    ForEach(Translator.Mode.allCases, id: \.rawValue) { mode in
-                        Text(mode.localizedStringKey)
-                            .tag(mode)
-                    }
-                } label: {
-                    Text("Mode")
-                }
-                .fixedSize()
-
-                Picker(selection: translatorServiceBindable.style) {
-                    ForEach(Translator.Style.allCases, id: \.rawValue) { style in
-                        Text(style.localizedStringKey)
-                            .tag(style)
-                    }
-                } label: {
-                    Text("Style")
-                }
-                .fixedSize()
-            }
-            .scenePadding()
-
+        VStack(spacing: 0.0) {
             HStack {
                 TextEditor(text: translatorServiceBindable.sourceString)
                 TextEditor(text: .constant(translatorService.translatedString))
@@ -104,34 +81,62 @@ struct MainView: View {
                         translatorService.translatedString = ""
                     }
 
-                    Button("Translate") {
-                        Task {
-                            do {
-                                try await translatorService.translate()
-                            } catch {
-                            }
-                        }
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(translatorService.sourceString.isEmpty)
+                    Spacer()
 
-                    Button("Use as source text") {
+                    Button("Use as source") {
                         translatorService.sourceString = translatorService.translatedString
                     }
                 }
 
-                HStack {
-                    Spacer()
-
-                    if translatorService.isTranslating {
-                        ProgressView()
-                            .progressViewStyle(.circular)
-                            .controlSize(.small)
-                            .padding(.horizontal, 4.0)
+                Button("Translate") {
+                    Task {
+                        do {
+                            try await translatorService.translate()
+                        } catch {
+                        }
                     }
                 }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .disabled(translatorService.sourceString.isEmpty)
             }
             .scenePadding()
+        }
+        .toolbar {
+            ToolbarItem {
+            }
+
+            if translatorService.isTranslating {
+                ToolbarItem {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                        .controlSize(.small)
+                }
+            }
+
+            ToolbarItem {
+                Picker(selection: translatorServiceBindable.mode) {
+                    ForEach(Translator.Mode.allCases, id: \.rawValue) { mode in
+                        Text(mode.localizedStringKey)
+                            .tag(mode)
+                    }
+                } label: {
+                    Text("Mode")
+                }
+                .fixedSize()
+            }
+
+            ToolbarItem {
+                Picker(selection: translatorServiceBindable.style) {
+                    ForEach(Translator.Style.allCases, id: \.rawValue) { style in
+                        Text(style.localizedStringKey)
+                            .tag(style)
+                    }
+                } label: {
+                    Text("Style")
+                }
+                .fixedSize()
+            }
         }
         .onAppear {
             translatorService.updateModel()
