@@ -36,7 +36,7 @@ public final class CachedModel {
         case unavailable
     }
 
-    public var state: State {
+    var state: State {
         if let download {
             .loading(download.progress)
         } else if let url {
@@ -52,13 +52,13 @@ public final class CachedModel {
         }
     }
 
-    public let source: ModelSource
+    let source: ModelSource
 
     init(source: ModelSource) {
         self.source = source
     }
 
-    public func update() throws {
+    func update() throws {
         let modelsDirectory = try modelsDirectory
         let fileURL = modelsDirectory.appending(component: source.fileName)
         if FileManager.default.fileExists(at: fileURL) {
@@ -68,7 +68,7 @@ public final class CachedModel {
         }
     }
 
-    public func download() async throws {
+    func download() async throws {
         if let download {
             try await download.task.value
         } else {
@@ -97,5 +97,13 @@ public final class CachedModel {
             url = fileURL
         }
         return Download(task: task, progress: downloadTask.progress)
+    }
+
+    func purge() throws {
+        guard let url else {
+            return
+        }
+        try FileManager.default.removeItem(at: url)
+        self.url = nil
     }
 }

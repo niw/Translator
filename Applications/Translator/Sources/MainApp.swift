@@ -18,5 +18,10 @@ struct MainApp: App {
             MainView()
                 .environment(appDelegate.translatorService)
         }
+
+        Settings {
+            SettingsView()
+                .environment(appDelegate.translatorService)
+        }
     }
 }

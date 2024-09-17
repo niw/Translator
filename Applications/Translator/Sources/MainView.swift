@@ -55,35 +55,13 @@ struct MainView: View {
     @Environment(TranslatorService.self)
     private var translatorService
 
+    @Environment(\.openSettings)
+    private var openSettings
+
     var body: some View {
         let translatorServiceBindable = Bindable(translatorService)
 
         VStack {
-            switch translatorService.model.state {
-            case .available:
-                EmptyView()
-            case .unavailable:
-                HStack {
-                    Text("Model is not available yet.")
-                    Button("Download") {
-                        translatorService.downloadModel()
-                    }
-                }
-                .scenePadding()
-            case .loading(let progress):
-                HStack {
-                    if let progress {
-                        ProgressView(progress)
-                        Button("Cancel") {
-                            progress.cancel()
-                        }
-                    } else {
-                        Text("Loading…")
-                    }
-                }
-                .scenePadding()
-            }
-
             HStack {
                 Picker(selection: translatorServiceBindable.mode) {
                     ForEach(Translator.Mode.allCases, id: \.rawValue) { mode in
@@ -154,6 +132,11 @@ struct MainView: View {
                 }
             }
             .scenePadding()
+        }
+        .onAppear {
+            if case .unavailable = translatorService.modelState {
+                openSettings()
+            }
         }
     }
 }

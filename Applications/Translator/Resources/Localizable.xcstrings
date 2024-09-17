@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@" : {
+
+    },
     "Academic Presentation" : {
 
     },
@@ -19,6 +22,12 @@
     "Clear" : {
 
     },
+    "Delete" : {
+
+    },
+    "Details:" : {
+
+    },
     "Download" : {
 
     },
@@ -26,6 +35,9 @@
 
     },
     "English to Japanese" : {
+
+    },
+    "File:" : {
 
     },
     "Formal" : {
@@ -37,19 +49,22 @@
     "Journalistic" : {
 
     },
-    "Loading…" : {
-
-    },
     "Mode" : {
 
     },
-    "Model is not available yet." : {
+    "Model" : {
+
+    },
+    "Name:" : {
 
     },
     "NSFW" : {
 
     },
     "Paste" : {
+
+    },
+    "Show details" : {
 
     },
     "Slang" : {

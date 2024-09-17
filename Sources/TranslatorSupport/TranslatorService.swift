@@ -31,10 +31,17 @@ public final class TranslatorService {
 
     public var translatedString: String = ""
 
-    public let model: CachedModel
+    public let modelSource: ModelSource
+
+    private let model: CachedModel
 
     public init(modelSource: ModelSource = .default) {
+        self.modelSource = modelSource
         model = CachedModel(source: modelSource)
+    }
+
+    public var modelState: CachedModel.State {
+        model.state
     }
 
     private var translatorLoadingTask: Task<Translator, any Swift.Error>?
@@ -70,6 +77,18 @@ public final class TranslatorService {
                 preloadModel()
             } catch {
             }
+        }
+    }
+
+    public func purgeModel() {
+        do {
+            try model.update()
+        } catch {
+        }
+
+        do {
+            try model.purge()
+        } catch {
         }
     }
 
