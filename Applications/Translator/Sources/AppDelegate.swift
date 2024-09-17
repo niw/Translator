@@ -49,6 +49,6 @@ extension AppDelegate: NSApplicationDelegate {
         NSApplication.shared.servicesProvider = ServiceProvider(translatorService: translatorService)
         NSUpdateDynamicServices()
 
-        translatorService.preloadModel()
+        translatorService.model.load()
     }
 }

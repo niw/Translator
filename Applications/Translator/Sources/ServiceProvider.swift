@@ -22,7 +22,7 @@ final class ServiceProvider: NSObject {
         guard let string = pasteboard.string(forType: .string) else {
             return
         }
-        translatorService.sourceString = string
+        translatorService.inputString = string
         Task {
             do {
                 try await translatorService.translate()

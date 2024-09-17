@@ -63,7 +63,7 @@ struct MainView: View {
 
         VStack(spacing: 0.0) {
             HStack {
-                TextEditor(text: translatorServiceBindable.sourceString)
+                TextEditor(text: translatorServiceBindable.inputString)
                 TextEditor(text: .constant(translatorService.translatedString))
             }
             .font(.system(size: 16.0))
@@ -72,19 +72,19 @@ struct MainView: View {
                 HStack {
                     Button("Paste") {
                         if let string = NSPasteboard.general.string(forType: .string) {
-                            translatorService.sourceString = string
+                            translatorService.inputString = string
                         }
                     }
 
                     Button("Clear") {
-                        translatorService.sourceString = ""
+                        translatorService.inputString = ""
                         translatorService.translatedString = ""
                     }
 
                     Spacer()
 
-                    Button("Use as source") {
-                        translatorService.sourceString = translatorService.translatedString
+                    Button("Use as input") {
+                        translatorService.inputString = translatorService.translatedString
                     }
                 }
 
@@ -98,7 +98,7 @@ struct MainView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
-                .disabled(translatorService.sourceString.isEmpty)
+                .disabled(translatorService.inputString.isEmpty)
             }
             .scenePadding()
         }
@@ -139,9 +139,9 @@ struct MainView: View {
             }
         }
         .onAppear {
-            translatorService.updateModel()
+            translatorService.model.update()
 
-            if case .unavailable = translatorService.modelState {
+            if case .unavailable = translatorService.model.state {
                 openSettings()
             }
         }

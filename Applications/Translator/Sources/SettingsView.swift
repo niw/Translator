@@ -21,14 +21,14 @@ struct ModelSettingsView: View {
                 Text("Name:")
                     .gridColumnAlignment(.trailing)
 
-                Text(translatorService.modelSource.name)
+                Text(translatorService.model.source.name)
             }
 
             GridRow {
                 Text("Details:")
                     .gridColumnAlignment(.trailing)
 
-                Link(destination: translatorService.modelSource.wegpageURL) {
+                Link(destination: translatorService.model.source.wegpageURL) {
                     Text("Show details")
                 }
             }
@@ -37,13 +37,13 @@ struct ModelSettingsView: View {
                 Text("File:")
                     .gridColumnAlignment(.trailing)
 
-                switch translatorService.modelState {
+                switch translatorService.model.state {
                 case .unavailable:
                     Button("Download") {
-                        translatorService.downloadModel()
+                        translatorService.model.download()
                     }
 
-                case .loading(let progress):
+                case .downloading(let progress):
                     if let progress {
                         VStack(alignment: .leading) {
                             ProgressView(progress)
@@ -70,7 +70,7 @@ struct ModelSettingsView: View {
                         })
 
                         Button(role: .destructive) {
-                            translatorService.purgeModel()
+                            translatorService.model.purge()
                         } label: {
                             Text("Delete")
                         }
@@ -80,7 +80,7 @@ struct ModelSettingsView: View {
         }
         .frame(width: 500.0)
         .onAppear {
-            translatorService.updateModel()
+            translatorService.model.update()
         }
     }
 }

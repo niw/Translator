@@ -20,7 +20,7 @@ private extension ModelSource {
 
 @MainActor
 @Observable
-public final class CachedModel {
+final class CachedModel {
     private struct Download {
         var task: Task<Void, any Swift.Error>
         var progress: Progress
@@ -30,15 +30,15 @@ public final class CachedModel {
 
     private var url: URL?
 
-    public enum State: Sendable, Equatable {
-        case loading(Progress?)
-        case available(URL)
+    enum State: Sendable, Equatable {
         case unavailable
+        case downloading(Progress?)
+        case available(URL)
     }
 
     var state: State {
         if let download {
-            .loading(download.progress)
+            .downloading(download.progress)
         } else if let url {
             .available(url)
         } else {
@@ -46,21 +46,17 @@ public final class CachedModel {
         }
     }
 
-    private var modelsDirectory: URL {
-        get throws {
-            try FileManager.default.applicationSupportDirectory(named: "Models")
-        }
-    }
+    let modelsCacheURL: URL
 
     let source: ModelSource
 
-    init(source: ModelSource) {
+    init(modelsCacheURL: URL, source: ModelSource) {
+        self.modelsCacheURL = modelsCacheURL
         self.source = source
     }
 
     func update() throws {
-        let modelsDirectory = try modelsDirectory
-        let fileURL = modelsDirectory.appending(component: source.fileName)
+        let fileURL = modelsCacheURL.appending(component: source.fileName)
         if FileManager.default.fileExists(at: fileURL) {
             url = fileURL
         } else {
@@ -90,9 +86,8 @@ public final class CachedModel {
         let request = URLRequest(url: self.source.url)
         let downloadTask = URLSession.shared.downloadTask(with: request)
         let task = Task {
-            let modelsDirectory = try modelsDirectory
-            try FileManager.default.createDirectory(at: modelsDirectory, isExcludedFromBackup: true)
-            let fileURL = modelsDirectory.appending(component: source.fileName)
+            try FileManager.default.createDirectory(at: modelsCacheURL, isExcludedFromBackup: true)
+            let fileURL = modelsCacheURL.appending(component: source.fileName)
             try await downloadTask.resumeDownloading(to: fileURL)
             url = fileURL
         }

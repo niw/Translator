@@ -27,76 +27,15 @@ public final class TranslatorService {
 
     public var style: Translator.Style = .technical
 
-    public var sourceString: String = ""
+    public var inputString: String = ""
 
     public var translatedString: String = ""
 
-    public let modelSource: ModelSource
+    public let model: Model
 
-    private let model: CachedModel
-
-    public init(modelSource: ModelSource = .default) {
-        self.modelSource = modelSource
-        model = CachedModel(source: modelSource)
-    }
-
-    public var modelState: CachedModel.State {
-        model.state
-    }
-
-    private var translatorLoadingTask: Task<Translator, any Swift.Error>?
-
-    public func updateModel() {
-        do {
-            try model.update()
-        } catch {
-        }
-    }
-
-    public func preloadModel() {
-        do {
-            try model.update()
-        } catch {
-        }
-
-        guard case .available(let url) = model.state else {
-            return
-        }
-
-        translatorLoadingTask = Task {
-            try await Translator(modelURL: url)
-        }
-    }
-
-    public func downloadModel() {
-        do {
-            try model.update()
-        } catch {
-        }
-
-        guard case .unavailable = model.state else {
-            return
-        }
-
-        Task {
-            do {
-                try await model.download()
-                preloadModel()
-            } catch {
-            }
-        }
-    }
-
-    public func purgeModel() {
-        do {
-            try model.update()
-        } catch {
-        }
-
-        do {
-            try model.purge()
-        } catch {
-        }
+    public init() {
+        let modelsCacheURL = try! FileManager.default.applicationSupportDirectory(named: "Models")
+        model = Model(cached: CachedModel(modelsCacheURL: modelsCacheURL, source: .default))
     }
 
     private var translationTask: Box<Task<Void, any Swift.Error>>?
@@ -108,7 +47,7 @@ public final class TranslatorService {
     public func translate() async throws {
         let previousTask = translationTask
 
-        let sourceString = sourceString
+        let inputString = inputString
         let mode = mode
         let style = style
 
@@ -133,17 +72,19 @@ public final class TranslatorService {
                 }
             }
 
-            preloadModel()
-
-            guard let translatorLoadingTask else {
+            guard let llamaModel = try await model.llamaModel else {
                 throw Error.failed(reason: "No model available.")
             }
 
             translatedString = ""
 
-            let translator = try await translatorLoadingTask.value
+            let prompt = Translator.prompt(
+                mode: mode,
+                style: style,
+                input: inputString
+            )
 
-            for try await output in translator.translate(sourceString, mode: mode, style: style) {
+            for try await output in llamaModel.complete(prompt) {
                 translatedString.append(output)
             }
         })
