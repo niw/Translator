@@ -12,6 +12,12 @@ private enum Error: Swift.Error {
     case failed(reason: String)
 }
 
+private extension Double {
+    var seconds: UInt64 {
+        UInt64(self * 1_000_000_000)
+    }
+}
+
 private final class Box<T> {
     var value: T
 
@@ -23,11 +29,54 @@ private final class Box<T> {
 @MainActor
 @Observable
 public final class TranslatorService {
-    public var mode: Translator.Mode = .automatic
+    public var isAutoTranslationEnabled: Bool = true {
+        didSet {
+            guard oldValue != isAutoTranslationEnabled else {
+                return
+            }
+            inputDidChange()
+        }
+    }
 
-    public var style: Translator.Style = .technical
+    public var mode: Translator.Mode = .autoDetect {
+        didSet {
+            guard oldValue != mode else {
+                return
+            }
+            inputDidChange()
+        }
+    }
 
-    public var inputString: String = ""
+    public var style: Translator.Style = .technical {
+        didSet {
+            guard oldValue != style else {
+                return
+            }
+            inputDidChange()
+        }
+    }
+
+    public var inputString: String = "" {
+        didSet {
+            guard oldValue != inputString else {
+                return
+            }
+            inputDidChange()
+        }
+    }
+
+    private func inputDidChange() {
+        guard isAutoTranslationEnabled else {
+            return
+        }
+
+        Task {
+            do {
+                try await translate(debounce: true)
+            } catch {
+            }
+        }
+    }
 
     public var translatedString: String = ""
 
@@ -45,6 +94,14 @@ public final class TranslatorService {
     }
 
     public func translate() async throws {
+        guard !isAutoTranslationEnabled else {
+            return
+        }
+
+        try await translate(debounce: false)
+    }
+
+    private func translate(debounce: Bool) async throws {
         let previousTask = translationTask
 
         let inputString = inputString
@@ -72,16 +129,26 @@ public final class TranslatorService {
                 }
             }
 
+            if debounce {
+                try await Task.sleep(nanoseconds: 1.0.seconds)
+            }
+
             guard let llamaModel = try await model.llamaModel else {
                 throw Error.failed(reason: "No model available.")
             }
 
             translatedString = ""
 
+            let trimmedInputString = inputString.trimmingCharacters(in: .whitespacesAndNewlines)
+
+            guard !trimmedInputString.isEmpty else {
+                return
+            }
+
             let prompt = Translator.prompt(
                 mode: mode,
                 style: style,
-                input: inputString
+                input: trimmedInputString
             )
 
             for try await output in llamaModel.complete(prompt) {

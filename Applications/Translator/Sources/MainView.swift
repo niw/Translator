@@ -12,8 +12,8 @@ import TranslatorSupport
 private extension Translator.Mode {
     var localizedStringKey: LocalizedStringKey {
         switch self {
-        case .automatic:
-            LocalizedStringKey("Automatic")
+        case .autoDetect:
+            LocalizedStringKey("Detect")
         case .englishToJapanese:
             LocalizedStringKey("English to Japanese")
         case .japaneseToEnglish:
@@ -88,30 +88,36 @@ struct MainView: View {
                     }
                 }
 
-                Button("Translate") {
-                    Task {
-                        do {
-                            try await translatorService.translate()
-                        } catch {
+                if !translatorService.isAutoTranslationEnabled {
+                    Button("Translate") {
+                        Task {
+                            do {
+                                try await translatorService.translate()
+                            } catch {
+                            }
                         }
                     }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
+                    .disabled(translatorService.inputString.isEmpty)
                 }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .disabled(translatorService.inputString.isEmpty)
             }
             .scenePadding()
         }
         .toolbar {
-            ToolbarItem {
-            }
-
             if translatorService.isTranslating {
                 ToolbarItem {
                     ProgressView()
                         .progressViewStyle(.circular)
                         .controlSize(.small)
                 }
+            }
+
+            ToolbarItem {
+                Toggle(isOn: translatorServiceBindable.isAutoTranslationEnabled) {
+                    Text("Automatic")
+                }
+                .toggleStyle(.switch)
             }
 
             ToolbarItem {

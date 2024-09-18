@@ -10,7 +10,7 @@ import Foundation
 private extension Translator.Mode {
     func value(for string: String) -> String {
         switch self {
-        case .automatic:
+        case .autoDetect:
             let totalCount = string.unicodeScalars.count
             let asciiCount = string.unicodeScalars.count { $0.isASCII }
             if asciiCount < totalCount * 3 / 4 {
@@ -26,7 +26,7 @@ private extension Translator.Mode {
 
 public enum Translator {
     public enum Mode: String, CaseIterable {
-        case automatic
+        case autoDetect
         case englishToJapanese = "English to Japanese"
         case japaneseToEnglish = "Japanese to English"
     }
@@ -64,12 +64,11 @@ public enum Translator {
         """
 
     static func prompt(mode: Mode, style: Style, input: String) -> String {
-        let trimmedInputString = input.trimmingCharacters(in: .whitespacesAndNewlines)
         return String(
             format: template,
-            mode.value(for: trimmedInputString),
+            mode.value(for: input),
             style.rawValue,
-            trimmedInputString
+            input
         )
     }
 }
