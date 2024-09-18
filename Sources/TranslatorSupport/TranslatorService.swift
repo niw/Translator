@@ -29,9 +29,9 @@ private final class Box<T> {
 @MainActor
 @Observable
 public final class TranslatorService {
-    public var isAutoTranslationEnabled: Bool = true {
+    public var isAutomaticTranslationEnabled: Bool = true {
         didSet {
-            guard oldValue != isAutoTranslationEnabled else {
+            guard oldValue != isAutomaticTranslationEnabled else {
                 return
             }
             inputDidChange()
@@ -66,7 +66,7 @@ public final class TranslatorService {
     }
 
     private func inputDidChange() {
-        guard isAutoTranslationEnabled else {
+        guard isAutomaticTranslationEnabled else {
             return
         }
 
@@ -94,7 +94,7 @@ public final class TranslatorService {
     }
 
     public func translate() async throws {
-        guard !isAutoTranslationEnabled else {
+        guard !isAutomaticTranslationEnabled else {
             return
         }
 
@@ -129,6 +129,13 @@ public final class TranslatorService {
                 }
             }
 
+            let trimmedInputString = inputString.trimmingCharacters(in: .whitespacesAndNewlines)
+
+            guard !trimmedInputString.isEmpty else {
+                translatedString = ""
+                return
+            }
+
             if debounce {
                 try await Task.sleep(nanoseconds: 1.0.seconds)
             }
@@ -137,19 +144,13 @@ public final class TranslatorService {
                 throw Error.failed(reason: "No model available.")
             }
 
-            translatedString = ""
-
-            let trimmedInputString = inputString.trimmingCharacters(in: .whitespacesAndNewlines)
-
-            guard !trimmedInputString.isEmpty else {
-                return
-            }
-
             let prompt = Translator.prompt(
                 mode: mode,
                 style: style,
                 input: trimmedInputString
             )
+
+            translatedString = ""
 
             for try await output in llamaModel.complete(prompt) {
                 translatedString.append(output)

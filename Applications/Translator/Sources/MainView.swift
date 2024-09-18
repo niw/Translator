@@ -90,7 +90,7 @@ struct MainView: View {
         }
         .toolbar {
             ToolbarItemGroup {
-                if !translatorService.isAutoTranslationEnabled {
+                if !translatorService.isAutomaticTranslationEnabled {
                     Button {
                         Task {
                             do {
@@ -104,7 +104,7 @@ struct MainView: View {
                     .disabled(translatorService.inputString.isEmpty)
                 }
 
-                Toggle(isOn: translatorServiceBindable.isAutoTranslationEnabled) {
+                Toggle(isOn: translatorServiceBindable.isAutomaticTranslationEnabled) {
                     Label {
                         Text("Automatic")
                     } icon: {
