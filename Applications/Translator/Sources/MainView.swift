@@ -59,68 +59,109 @@ struct MainView: View {
     private var openSettings
 
     var body: some View {
+        // FIXME: Better user interface.
+
         let translatorServiceBindable = Bindable(translatorService)
 
         VStack(spacing: 0.0) {
-            HStack {
+            HSplitView {
                 TextEditor(text: translatorServiceBindable.inputString)
                 TextEditor(text: .constant(translatorService.translatedString))
             }
             .font(.system(size: 16.0))
 
-            ZStack {
-                HStack {
-                    Button("Paste") {
-                        if let string = NSPasteboard.general.string(forType: .string) {
-                            translatorService.inputString = string
-                        }
-                    }
+            Divider()
 
-                    Button("Clear") {
-                        translatorService.inputString = ""
-                        translatorService.translatedString = ""
-                    }
+            HStack {
+                Spacer()
 
-                    Spacer()
-
-                    Button("Use as input") {
-                        translatorService.inputString = translatorService.translatedString
+                if translatorService.isTranslating {
+                    HStack {
+                        Text("Translating…")
+                        ProgressView()
+                            .progressViewStyle(.circular)
                     }
+                    .controlSize(.small)
+                    .scenePadding(.horizontal)
                 }
-
+            }
+            .frame(height: 24.0)
+            .background(.background)
+        }
+        .toolbar {
+            ToolbarItemGroup {
                 if !translatorService.isAutoTranslationEnabled {
-                    Button("Translate") {
+                    Button {
                         Task {
                             do {
                                 try await translatorService.translate()
                             } catch {
                             }
                         }
+                    } label: {
+                        Text("Translate")
                     }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.large)
                     .disabled(translatorService.inputString.isEmpty)
                 }
-            }
-            .scenePadding()
-        }
-        .toolbar {
-            if translatorService.isTranslating {
-                ToolbarItem {
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                        .controlSize(.small)
-                }
-            }
 
-            ToolbarItem {
                 Toggle(isOn: translatorServiceBindable.isAutoTranslationEnabled) {
-                    Text("Automatic")
+                    Label {
+                        Text("Automatic")
+                    } icon: {
+                        Image(systemName: "play.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 36.0, height: 12.0)
+                    }
                 }
-                .toggleStyle(.switch)
             }
 
-            ToolbarItem {
+            ToolbarItemGroup {
+                Button {
+                    if let string = NSPasteboard.general.string(forType: .string) {
+                        translatorService.inputString = string
+                    }
+                } label: {
+                    Label {
+                        Text("Paste")
+                    } icon: {
+                        Image(systemName: "doc.on.clipboard")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 36.0, height: 16.0)
+                    }
+                }
+
+                Button {
+                    translatorService.inputString = ""
+                    translatorService.translatedString = ""
+                } label: {
+                    Label {
+                        Text("Clear")
+                    } icon: {
+                        Image(systemName: "clear")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 36.0, height: 16.0)
+                    }
+                }
+
+                Button {
+                    translatorService.inputString = translatorService.translatedString
+                } label: {
+                    Label {
+                        Text("Use as input")
+                    } icon: {
+                        Image(systemName: "arrow.uturn.left")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 36.0, height: 16.0)
+                    }
+                }
+                .disabled(translatorService.translatedString.isEmpty)
+            }
+
+            ToolbarItemGroup {
                 Picker(selection: translatorServiceBindable.mode) {
                     ForEach(Translator.Mode.allCases, id: \.rawValue) { mode in
                         Text(mode.localizedStringKey)
@@ -130,9 +171,7 @@ struct MainView: View {
                     Text("Mode")
                 }
                 .fixedSize()
-            }
 
-            ToolbarItem {
                 Picker(selection: translatorServiceBindable.style) {
                     ForEach(Translator.Style.allCases, id: \.rawValue) { style in
                         Text(style.localizedStringKey)
