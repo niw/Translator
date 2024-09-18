@@ -7,23 +7,6 @@
 
 import Foundation
 
-private extension Translator.Mode {
-    func value(for string: String) -> String {
-        switch self {
-        case .autoDetect:
-            let totalCount = string.unicodeScalars.count
-            let asciiCount = string.unicodeScalars.count { $0.isASCII }
-            if asciiCount < totalCount * 3 / 4 {
-                return Self.japaneseToEnglish.rawValue
-            } else {
-                return Self.englishToJapanese.rawValue
-            }
-        case .englishToJapanese, .japaneseToEnglish:
-            return rawValue
-        }
-    }
-}
-
 public enum Translator {
     public enum Mode: String, CaseIterable {
         case autoDetect
@@ -70,5 +53,22 @@ public enum Translator {
             style.rawValue,
             input
         )
+    }
+}
+
+private extension Translator.Mode {
+    func value(for string: String) -> String {
+        switch self {
+        case .autoDetect:
+            let totalCount = string.unicodeScalars.count
+            let asciiCount = string.unicodeScalars.count { $0.isASCII }
+            if asciiCount < totalCount * 3 / 4 {
+                return Self.japaneseToEnglish.rawValue
+            } else {
+                return Self.englishToJapanese.rawValue
+            }
+        case .englishToJapanese, .japaneseToEnglish:
+            return rawValue
+        }
     }
 }
