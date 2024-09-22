@@ -58,7 +58,7 @@ actor LlamaContext {
     /// This variable is used to store temporarily invalid cchars
     private var temporary_invalid_cchars: [CChar]
 
-    var n_len: Int32 = 1024
+    var n_len: Int32 = 4096
     var n_cur: Int32 = 0
 
     var n_decode: Int32 = 0
@@ -67,7 +67,7 @@ actor LlamaContext {
         self.model = model
         self.context = context
         self.tokens_list = []
-        self.batch = llama_batch_init(512, 0, 1)
+        self.batch = llama_batch_init(2048, 0, 1)
         self.temporary_invalid_cchars = []
         let sparams = llama_sampler_chain_default_params()
         self.sampling = llama_sampler_chain_init(sparams)
@@ -131,14 +131,22 @@ actor LlamaContext {
         return batch.n_tokens;
     }
 
-    func completion_init(text: String) throws {
-        tokens_list = tokenize(text: text, add_bos: true)
+    func completion_init(text: String, suffix: String? = nil) throws {
+        // See `llama_batch_init()` call about the max tokens in batch.
+        let text_tokens_list = tokenize(text: text, add_bos: true)
+        if let suffix {
+            let suffix_tokens_list = tokenize(text: suffix, add_bos: false)
+            let limit = max(0, 2048 - suffix_tokens_list.count)
+            tokens_list = Array(text_tokens_list.prefix(limit)) + suffix_tokens_list
+        } else {
+            tokens_list = Array(text_tokens_list.prefix(2048))
+        }
+
         temporary_invalid_cchars = []
 
         llama_batch_clear(&batch)
 
-        // See `llama_batch_init()`.
-        for i1 in 0..<min(512, tokens_list.count) {
+        for i1 in 0..<tokens_list.count {
             let i = Int(i1)
             llama_batch_add(&batch, tokens_list[i], Int32(i), [0], false)
         }

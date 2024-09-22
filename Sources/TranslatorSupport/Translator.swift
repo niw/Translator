@@ -30,7 +30,7 @@ public enum Translator {
     }
 
     // See <https://huggingface.co/webbigdata/C3TR-Adapter_gguf>
-    private static let template =
+    private static let textFormat =
         """
         You are a highly skilled professional Japanese-English and English-Japanese translator. Translate the given text accurately, taking into account the context and specific instructions provided. Steps may include hints enclosed in square brackets [] with the key and value separated by a colon:. Only when the subject is specified in the Japanese sentence, the subject will be added when translating into English. If no additional instructions or context are provided, use your expertise to consider what the most appropriate context is and provide a natural translation that aligns with that context. When translating, strive to faithfully reflect the meaning and tone of the original text, pay attention to cultural nuances and differences in language usage, and ensure that the translation is grammatically correct and easy to read. After completing the translation, review it once more to check for errors or unnatural expressions. For technical terms and proper nouns, either leave them in the original language or use appropriate translations as necessary. Take a deep breath, calm down, and start translating.
         
@@ -41,17 +41,25 @@ public enum Translator {
         
         ### Input:
         %@
+        
+        """
+
+    private static let suffix =
+        """
         <end_of_turn>
         <start_of_turn>### Response:
         
         """
 
-    static func prompt(mode: Mode, style: Style, input: String) -> String {
-        return String(
-            format: template,
-            mode.value(for: input),
-            style.rawValue,
-            input
+    struct Prompt {
+        var text: String
+        var suffix: String
+    }
+
+    static func prompt(mode: Mode, style: Style, input: String) -> Prompt {
+        Prompt(
+            text: String(format: textFormat, mode.value(for: input), style.rawValue, input),
+            suffix: suffix
         )
     }
 }

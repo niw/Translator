@@ -16,13 +16,13 @@ public struct LlamaModel: Sendable {
         }.value
     }
 
-    public func complete(_ prompt: String) -> AsyncThrowingStream<String, any Swift.Error> {
+    public func complete(_ prompt: String, suffix: String? = nil) -> AsyncThrowingStream<String, any Swift.Error> {
         AsyncThrowingStream { continuation in
             let task = Task {
                 do {
                     try Task.checkCancellation()
 
-                    try await context.completion_init(text: prompt)
+                    try await context.completion_init(text: prompt, suffix: suffix)
 
                     try Task.checkCancellation()
 

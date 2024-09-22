@@ -152,7 +152,7 @@ public final class TranslatorService {
 
             translatedString = ""
 
-            for try await output in llamaModel.complete(prompt) {
+            for try await output in llamaModel.complete(prompt.text, suffix: prompt.suffix) {
                 translatedString.append(output)
             }
         })
