@@ -8,13 +8,17 @@
 import Foundation
 import SwiftUI
 
+enum WindowIdentifier: String {
+    case main
+}
+
 @main
 struct MainApp: App {
     @NSApplicationDelegateAdaptor
     private var appDelegate: AppDelegate
 
     var body: some Scene {
-        WindowGroup {
+        Window(appDelegate.localizedName, id: WindowIdentifier.main.rawValue) {
             MainView()
                 .environment(appDelegate.translatorService)
         }

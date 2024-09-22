@@ -40,4 +40,8 @@ extension AppDelegate: NSApplicationDelegate {
 
         translatorService.model.load()
     }
+
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        false
+    }
 }
