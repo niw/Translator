@@ -33,14 +33,14 @@ final class AppDelegate: NSObject {
     }
 
     func presentAboutPanel() {
-        if NSApp.activationPolicy() == .accessory {
-            NSApp.activate(ignoringOtherApps: true)
+        if NSApplication.shared.activationPolicy() == .accessory {
+            NSApplication.shared.activate(ignoringOtherApps: true)
         }
-        NSApp.orderFrontStandardAboutPanel()
+        NSApplication.shared.orderFrontStandardAboutPanel()
     }
 
     func terminate() {
-        NSApp.terminate(nil)
+        NSApplication.shared.terminate(nil)
     }
 }
 
