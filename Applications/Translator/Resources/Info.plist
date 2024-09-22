@@ -12,6 +12,8 @@
 			</dict>
 			<key>NSMessage</key>
 			<string>translate</string>
+			<key>NSRequiredContext</key>
+			<dict/>
 			<key>NSSendTypes</key>
 			<array>
 				<string>NSStringPboardType</string>
