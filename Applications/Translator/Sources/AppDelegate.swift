@@ -31,17 +31,6 @@ final class AppDelegate: NSObject {
         // Should not reach here.
         return ""
     }
-
-    func presentAboutPanel() {
-        if NSApplication.shared.activationPolicy() == .accessory {
-            NSApplication.shared.activate(ignoringOtherApps: true)
-        }
-        NSApplication.shared.orderFrontStandardAboutPanel()
-    }
-
-    func terminate() {
-        NSApplication.shared.terminate(nil)
-    }
 }
 
 extension AppDelegate: NSApplicationDelegate {
