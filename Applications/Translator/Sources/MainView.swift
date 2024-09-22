@@ -187,7 +187,11 @@ struct MainView: View {
             translatorService.model.update()
 
             if case .unavailable = translatorService.model.state {
-                openSettings()
+                // This delay is needed to take Settings over Main window
+                // when it is opened by `openWindow(id:)`.
+                Task {
+                    openSettings()
+                }
             }
         }
     }

@@ -8,8 +8,7 @@
 import Foundation
 import SwiftUI
 
-enum WindowIdentifier: String {
-    case main
+private struct Nothing: Equatable {
 }
 
 @main
@@ -17,10 +16,19 @@ struct MainApp: App {
     @NSApplicationDelegateAdaptor
     private var appDelegate: AppDelegate
 
+    @Environment(\.openWindow)
+    private var openWindow
+
     var body: some Scene {
         Window(appDelegate.localizedName, id: WindowIdentifier.main.rawValue) {
             MainView()
                 .environment(appDelegate.translatorService)
+        }
+        // This is a hack to take SwiftUI API in `AppDelegate`. This `action` is called
+        // before `applicationDidFinishLaunching(_:)`.
+        // See `applicationDidFinishLaunching(_:)` for details.
+        .onChange(of: Nothing(), initial: true) {
+            appDelegate.openWindow = openWindow
         }
 
         Settings {

@@ -22,9 +22,16 @@ final class ServiceProvider: NSObject {
         guard let string = pasteboard.string(forType: .string) else {
             return
         }
-        translatorService.inputString = string
+
+        NSApplication.shared.activate(ignoringOtherApps: true)
+
+        if let window = NSApplication.shared.windows.first {
+            window.makeKeyAndOrderFront(nil)
+        }
+
         Task {
             do {
+                translatorService.inputString = string
                 try await translatorService.translate()
             } catch {
             }
