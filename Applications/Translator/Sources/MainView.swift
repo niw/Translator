@@ -86,7 +86,7 @@ struct MainView: View {
                 }
             }
             .frame(height: 24.0)
-            .background(.background)
+            .background(.windowBackground)
         }
         .toolbar {
             ToolbarItemGroup {
