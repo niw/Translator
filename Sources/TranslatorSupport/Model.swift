@@ -156,12 +156,12 @@ public final class Model: ModelProtocol {
 
 @MainActor
 @Observable
-final class PreviewModel: ModelProtocol {
-    private(set) var state: ModelState = .unavailable
+public final class PreviewModel: ModelProtocol {
+    public private(set) var state: ModelState = .unavailable
 
-    let source: ModelSource
+    public let source: ModelSource
 
-    init() {
+    public init() {
         source = ModelSource(
             name: "Preview",
             wegpageURL: URL(string: "http://example.com")!,
@@ -169,14 +169,14 @@ final class PreviewModel: ModelProtocol {
         )
     }
 
-    func update() {
+    public func update() {
         state = .available(URL(filePath: "/tmp"))
     }
 
-    func load() {
+    public func load() {
     }
 
-    func download() {
+    public func download() {
         Task {
             do {
                 state = .downloading(nil)
@@ -197,13 +197,7 @@ final class PreviewModel: ModelProtocol {
         }
     }
 
-    func purge() {
+    public func purge() {
         state = .unavailable
-    }
-}
-
-extension AnyModel {
-    public static var preview: AnyModel {
-        PreviewModel().eraseToAnyModel()
     }
 }

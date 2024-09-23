@@ -256,8 +256,8 @@ public final class TranslatorService: TranslatorServiceProtocol {
 
 @MainActor
 @Observable
-final class PreviewTranslatorService: TranslatorServiceProtocol {
-    var isAutomaticTranslationEnabled: Bool = true {
+public final class PreviewTranslatorService: TranslatorServiceProtocol {
+    public var isAutomaticTranslationEnabled: Bool = true {
         didSet {
             guard oldValue != isAutomaticTranslationEnabled else {
                 return
@@ -266,7 +266,7 @@ final class PreviewTranslatorService: TranslatorServiceProtocol {
         }
     }
 
-    var mode: Translator.Mode = .autoDetect {
+    public var mode: Translator.Mode = .autoDetect {
         didSet {
             guard oldValue != mode else {
                 return
@@ -275,7 +275,7 @@ final class PreviewTranslatorService: TranslatorServiceProtocol {
         }
     }
 
-    var style: Translator.Style = .technical {
+    public var style: Translator.Style = .technical {
         didSet {
             guard oldValue != style else {
                 return
@@ -284,7 +284,7 @@ final class PreviewTranslatorService: TranslatorServiceProtocol {
         }
     }
 
-    var inputString: String = "" {
+    public var inputString: String = "" {
         didSet {
             guard oldValue != inputString else {
                 return
@@ -304,17 +304,17 @@ final class PreviewTranslatorService: TranslatorServiceProtocol {
         }
     }
 
-    var translatedString: String = ""
+    public var translatedString: String = ""
 
-    let model: PreviewModel
+    public let model: PreviewModel
 
-    init() {
+    public init() {
         model = PreviewModel()
     }
 
-    var isTranslating: Bool = false
+    public var isTranslating: Bool = false
 
-    func translate() async throws {
+    public func translate() async throws {
         do {
             isTranslating = true
             translatedString = ""
@@ -323,11 +323,5 @@ final class PreviewTranslatorService: TranslatorServiceProtocol {
         } catch {
         }
         isTranslating = false
-    }
-}
-
-extension AnyTranslatorService {
-    public static var preview: AnyTranslatorService {
-        PreviewTranslatorService().eraseToAnyTranslatorService()
     }
 }

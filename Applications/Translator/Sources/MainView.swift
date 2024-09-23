@@ -198,5 +198,5 @@ struct MainView: View {
 
 #Preview {
     MainView()
-        .environment(AnyTranslatorService.preview)
+        .environment(PreviewTranslatorService().eraseToAnyTranslatorService())
 }

@@ -109,5 +109,5 @@ struct SettingsView: View {
 
 #Preview {
     SettingsView()
-        .environment(AnyTranslatorService.preview)
+        .environment(PreviewTranslatorService().eraseToAnyTranslatorService())
 }
