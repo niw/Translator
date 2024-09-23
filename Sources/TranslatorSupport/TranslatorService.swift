@@ -257,13 +257,52 @@ public final class TranslatorService: TranslatorServiceProtocol {
 @MainActor
 @Observable
 final class PreviewTranslatorService: TranslatorServiceProtocol {
-    var isAutomaticTranslationEnabled: Bool = true
+    var isAutomaticTranslationEnabled: Bool = true {
+        didSet {
+            guard oldValue != isAutomaticTranslationEnabled else {
+                return
+            }
+            inputDidChange()
+        }
+    }
 
-    var mode: Translator.Mode = .autoDetect
+    var mode: Translator.Mode = .autoDetect {
+        didSet {
+            guard oldValue != mode else {
+                return
+            }
+            inputDidChange()
+        }
+    }
 
-    var style: Translator.Style = .technical
+    var style: Translator.Style = .technical {
+        didSet {
+            guard oldValue != style else {
+                return
+            }
+            inputDidChange()
+        }
+    }
 
-    var inputString: String = ""
+    var inputString: String = "" {
+        didSet {
+            guard oldValue != inputString else {
+                return
+            }
+            inputDidChange()
+        }
+    }
+
+    private func inputDidChange() {
+        if isAutomaticTranslationEnabled {
+            Task {
+                do {
+                    try await translate()
+                } catch {
+                }
+            }
+        }
+    }
 
     var translatedString: String = ""
 
@@ -279,8 +318,8 @@ final class PreviewTranslatorService: TranslatorServiceProtocol {
         do {
             isTranslating = true
             translatedString = ""
-            try await Task.sleep(nanoseconds: 1_000_000_000)
-            translatedString = inputString
+            try await Task.sleep(nanoseconds: 1.seconds)
+            translatedString = "Translated from \(inputString)"
         } catch {
         }
         isTranslating = false
