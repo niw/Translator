@@ -107,30 +107,6 @@ actor LlamaContext {
         return LlamaContext(model: model, context: context)
     }
 
-    func model_info() -> String {
-        let result = UnsafeMutablePointer<Int8>.allocate(capacity: 256)
-        result.initialize(repeating: Int8(0), count: 256)
-        defer {
-            result.deallocate()
-        }
-
-        // TODO: this is probably very stupid way to get the string from C
-
-        let nChars = llama_model_desc(model, result, 256)
-        let bufferPointer = UnsafeBufferPointer(start: result, count: Int(nChars))
-
-        var SwiftString = ""
-        for char in bufferPointer {
-            SwiftString.append(Character(UnicodeScalar(UInt8(char))))
-        }
-
-        return SwiftString
-    }
-
-    func get_n_tokens() -> Int32 {
-        return batch.n_tokens;
-    }
-
     func completion_init(text: String, suffix: String? = nil) throws {
         // See `llama_batch_init()` call about the max tokens in batch.
         let text_tokens_list = tokenize(text: text, add_bos: true)
