@@ -27,8 +27,102 @@ private final class Box<T> {
 }
 
 @MainActor
+public protocol TranslatorServiceProtocol: ObservableObject {
+    associatedtype SomeModel: ModelProtocol
+
+    var model: SomeModel { get }
+
+    var isAutomaticTranslationEnabled: Bool { get set }
+
+    var mode: Translator.Mode { get set }
+
+    var style: Translator.Style { get set }
+
+    var inputString: String { set get }
+
+    var translatedString: String { set get }
+
+    var isTranslating: Bool { get }
+
+    func translate() async throws -> Void
+}
+
+@MainActor
 @Observable
-public final class TranslatorService {
+public final class AnyTranslatorService: TranslatorServiceProtocol {
+    private let translatorService: any TranslatorServiceProtocol
+
+    init(_ translatorService: some TranslatorServiceProtocol) {
+        self.translatorService = translatorService
+    }
+
+    public var model: AnyModel {
+        translatorService.model.eraseToAnyModel()
+    }
+
+    public var isAutomaticTranslationEnabled: Bool {
+        get {
+            translatorService.isAutomaticTranslationEnabled
+        }
+        set {
+            translatorService.isAutomaticTranslationEnabled = newValue
+        }
+    }
+
+    public var mode: Translator.Mode {
+        get {
+            translatorService.mode
+        }
+        set {
+            translatorService.mode = newValue
+        }
+    }
+
+    public var style: Translator.Style {
+        get {
+            translatorService.style
+        }
+        set {
+            translatorService.style = newValue
+        }
+    }
+
+    public var inputString: String {
+        get {
+            translatorService.inputString
+        }
+        set {
+            translatorService.inputString = newValue
+        }
+    }
+
+    public var translatedString: String {
+        get {
+            translatorService.translatedString
+        }
+        set {
+            translatorService.translatedString = newValue
+        }
+    }
+
+    public var isTranslating: Bool {
+        translatorService.isTranslating
+    }
+
+    public func translate() async throws {
+        try await translatorService.translate()
+    }
+}
+
+extension TranslatorServiceProtocol {
+    public func eraseToAnyTranslatorService() -> AnyTranslatorService {
+        AnyTranslatorService(self)
+    }
+}
+
+@MainActor
+@Observable
+public final class TranslatorService: TranslatorServiceProtocol {
     public var isAutomaticTranslationEnabled: Bool = true {
         didSet {
             guard oldValue != isAutomaticTranslationEnabled else {
@@ -157,5 +251,44 @@ public final class TranslatorService {
             }
         })
         translationTask = task
+    }
+}
+
+@MainActor
+@Observable
+final class PreviewTranslatorService: TranslatorServiceProtocol {
+    var isAutomaticTranslationEnabled: Bool = true
+
+    var mode: Translator.Mode = .autoDetect
+
+    var style: Translator.Style = .technical
+
+    var inputString: String = ""
+
+    var translatedString: String = ""
+
+    let model: PreviewModel
+
+    init() {
+        model = PreviewModel()
+    }
+
+    var isTranslating: Bool = false
+
+    func translate() async throws {
+        do {
+            isTranslating = true
+            translatedString = ""
+            try await Task.sleep(nanoseconds: 1_000_000_000)
+            translatedString = inputString
+        } catch {
+        }
+        isTranslating = false
+    }
+}
+
+extension AnyTranslatorService {
+    public static var preview: AnyTranslatorService {
+        PreviewTranslatorService().eraseToAnyTranslatorService()
     }
 }

@@ -52,20 +52,19 @@ private extension Translator.Style {
 }
 
 struct MainView: View {
-    @Environment(TranslatorService.self)
+    @Environment(AnyTranslatorService.self)
     private var translatorService
 
     @Environment(\.openSettings)
     private var openSettings
 
     var body: some View {
-        // FIXME: Better user interface.
-
-        let translatorServiceBindable = Bindable(translatorService)
+        @Bindable
+        var translatorService = translatorService
 
         VStack(spacing: 0.0) {
             HSplitView {
-                TextEditor(text: translatorServiceBindable.inputString)
+                TextEditor(text: $translatorService.inputString)
                 TextEditor(text: .constant(translatorService.translatedString))
             }
             .font(.system(size: 16.0))
@@ -104,7 +103,7 @@ struct MainView: View {
                     .disabled(translatorService.inputString.isEmpty)
                 }
 
-                Toggle(isOn: translatorServiceBindable.isAutomaticTranslationEnabled) {
+                Toggle(isOn: $translatorService.isAutomaticTranslationEnabled) {
                     Label {
                         Text("Automatic")
                     } icon: {
@@ -162,7 +161,7 @@ struct MainView: View {
             }
 
             ToolbarItemGroup {
-                Picker(selection: translatorServiceBindable.mode) {
+                Picker(selection: $translatorService.mode) {
                     ForEach(Translator.Mode.allCases, id: \.rawValue) { mode in
                         Text(mode.localizedStringKey)
                             .tag(mode)
@@ -172,7 +171,7 @@ struct MainView: View {
                 }
                 .fixedSize()
 
-                Picker(selection: translatorServiceBindable.style) {
+                Picker(selection: $translatorService.style) {
                     ForEach(Translator.Style.allCases, id: \.rawValue) { style in
                         Text(style.localizedStringKey)
                             .tag(style)
@@ -195,4 +194,9 @@ struct MainView: View {
             }
         }
     }
+}
+
+#Preview {
+    MainView()
+        .environment(AnyTranslatorService.preview)
 }

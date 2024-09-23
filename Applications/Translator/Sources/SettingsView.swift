@@ -11,7 +11,7 @@ import SwiftUI
 import TranslatorSupport
 
 struct ModelSettingsView: View {
-    @Environment(TranslatorService.self)
+    @Environment(AnyTranslatorService.self)
     private var translatorService
 
     var body: some View {
@@ -105,4 +105,9 @@ struct SettingsView: View {
         }
         .scenePadding()
     }
+}
+
+#Preview {
+    SettingsView()
+        .environment(AnyTranslatorService.preview)
 }

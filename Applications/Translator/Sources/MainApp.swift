@@ -22,7 +22,7 @@ struct MainApp: App {
     var body: some Scene {
         Window(appDelegate.localizedName, id: WindowIdentifier.main.rawValue) {
             MainView()
-                .environment(appDelegate.translatorService)
+                .environment(appDelegate.translatorService.eraseToAnyTranslatorService())
         }
         // This is a hack to take SwiftUI API in `AppDelegate`. This `action` is called
         // before `applicationDidFinishLaunching(_:)`.
@@ -33,7 +33,7 @@ struct MainApp: App {
 
         Settings {
             SettingsView()
-                .environment(appDelegate.translatorService)
+                .environment(appDelegate.translatorService.eraseToAnyTranslatorService())
         }
     }
 }
