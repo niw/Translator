@@ -16,7 +16,7 @@ struct ModelSettingsView: View {
 
     var body: some View {
         // FIXME: This layout is not preferred.
-        Grid(alignment: .leading, horizontalSpacing: 20.0, verticalSpacing: 10.0) {
+        Grid(alignment: .leading, verticalSpacing: 10.0) {
             GridRow {
                 Text("Name:")
                     .gridColumnAlignment(.trailing)
@@ -45,13 +45,17 @@ struct ModelSettingsView: View {
 
                 case .downloading(let progress):
                     if let progress {
-                        VStack(alignment: .leading) {
+                        HStack(alignment: .center) {
                             ProgressView(progress)
                                 .frame(width: 200.0)
 
-                            Button("Cancel") {
+                            Button("Cancel", systemImage: "xmark", role: .cancel) {
                                 progress.cancel()
                             }
+                            .symbolVariant(.circle)
+                            .symbolVariant(.fill)
+                            .buttonStyle(.borderless)
+                            .labelStyle(.iconOnly)
                         }
                     } else {
                         ProgressView()
