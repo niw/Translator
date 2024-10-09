@@ -22,7 +22,7 @@ public enum ModelState {
 }
 
 @MainActor
-public protocol ModelProtocol: ObservableObject {
+public protocol ModelProtocol: AnyObject {
     var state: ModelState { get }
 
     var source: ModelSource { get }

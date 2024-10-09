@@ -27,7 +27,7 @@ private final class Box<T> {
 }
 
 @MainActor
-public protocol TranslatorServiceProtocol: ObservableObject {
+public protocol TranslatorServiceProtocol: AnyObject {
     associatedtype SomeModel: ModelProtocol
 
     var model: SomeModel { get }
