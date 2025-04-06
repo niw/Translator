@@ -19,25 +19,6 @@ final class AppDelegate: NSObject {
     }
 
     var translatorService: TranslatorService = TranslatorService()
-
-    var localizedName: String {
-        for case let infoDictionary? in [
-            Bundle.main.localizedInfoDictionary,
-            Bundle.main.infoDictionary
-        ] {
-            for key in [
-                "CFBundleDisplayName",
-                "CFBundleName"
-            ] {
-                if let localizedName = infoDictionary[key] as? String {
-                    return localizedName
-                }
-            }
-        }
-
-        // Should not reach here.
-        return ""
-    }
 }
 
 extension AppDelegate: NSApplicationDelegate {

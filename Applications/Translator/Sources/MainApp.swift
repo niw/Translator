@@ -20,7 +20,7 @@ struct MainApp: App {
     private var openWindow
 
     var body: some Scene {
-        Window(appDelegate.localizedName, id: WindowIdentifier.main.rawValue) {
+        Window(WindowIdentifier.main.localizedName, id: WindowIdentifier.main.rawValue) {
             MainView()
                 .environment(appDelegate.translatorService.eraseToAnyTranslatorService())
         }
