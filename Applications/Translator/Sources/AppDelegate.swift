@@ -18,7 +18,7 @@ final class AppDelegate: NSObject {
         openWindow?(id: id.rawValue)
     }
 
-    var translatorService: TranslatorService = TranslatorService()
+    let translatorService: TranslatorService = TranslatorService()
 }
 
 extension AppDelegate: NSApplicationDelegate {
