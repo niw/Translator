@@ -43,14 +43,14 @@ struct ModelSettingsView: View {
                         translatorService.model.download()
                     }
 
-                case .downloading(let progress):
-                    if let progress {
+                case .downloading(let download):
+                    if let download {
                         HStack(alignment: .center) {
-                            ProgressView(progress)
+                            DownloadProgressView(download.progress)
                                 .frame(width: 200.0)
 
                             Button("Cancel", systemImage: "xmark", role: .cancel) {
-                                progress.cancel()
+                                download.cancel()
                             }
                             .symbolVariant(.circle)
                             .symbolVariant(.fill)

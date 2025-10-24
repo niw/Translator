@@ -21,24 +21,19 @@ private extension ModelSource {
 @MainActor
 @Observable
 final class CachedModel {
-    private struct Download {
-        var task: Task<Void, any Swift.Error>
-        var progress: Progress
-    }
-
     private var download: Download?
 
     private var url: URL?
 
-    enum State: Sendable, Equatable {
+    enum State: Sendable {
         case unavailable
-        case downloading(Progress?)
+        case downloading(Download?)
         case available(URL)
     }
 
     var state: State {
         if let download {
-            .downloading(download.progress)
+            .downloading(download)
         } else if let url {
             .available(url)
         } else {
@@ -66,32 +61,26 @@ final class CachedModel {
 
     func download() async throws {
         if let download {
-            try await download.task.value
+            try await download.result()
         } else {
-            let download = resumeDownload()
+            let request = URLRequest(url: self.source.url)
+
+            try FileManager.default.createDirectory(at: modelsCacheURL, isExcludedFromBackup: true)
+            let fileURL = modelsCacheURL.appending(component: source.fileName)
+
+            let download = Download(request, to: fileURL)
             self.download = download
             do {
-                try await download.task.value
+                try await download.result()
                 // Reentrant
                 self.download = nil
+                self.url = fileURL
             } catch {
                 // Reentrant
                 self.download = nil
                 throw error
             }
         }
-    }
-
-    private func resumeDownload() -> Download {
-        let request = URLRequest(url: self.source.url)
-        let downloadTask = URLSession.shared.downloadTask(with: request)
-        let task = Task {
-            try FileManager.default.createDirectory(at: modelsCacheURL, isExcludedFromBackup: true)
-            let fileURL = modelsCacheURL.appending(component: source.fileName)
-            try await downloadTask.resumeDownloading(to: fileURL)
-            url = fileURL
-        }
-        return Download(task: task, progress: downloadTask.progress)
     }
 
     func purge() throws {

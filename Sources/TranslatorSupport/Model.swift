@@ -17,7 +17,7 @@ private extension Double {
 
 public enum ModelState {
     case unavailable
-    case downloading(Progress?)
+    case downloading((any DownloadProtocol)?)
     case available(URL)
 }
 
@@ -83,8 +83,8 @@ public final class Model: ModelProtocol {
         switch cachedModel.state {
         case .unavailable:
             return .unavailable
-        case .downloading(let progress):
-            return .downloading(progress)
+        case .downloading(let download):
+            return .downloading(download)
         case .available(let url):
             return .available(url)
         }
@@ -182,17 +182,15 @@ public final class PreviewModel: ModelProtocol {
                 state = .downloading(nil)
 
                 try await Task.sleep(nanoseconds: 0.3.seconds)
-                let progress = Progress(totalUnitCount: 2)
-                state = .downloading(progress)
 
-                try await Task.sleep(nanoseconds: 0.5.seconds)
-                progress.completedUnitCount = 1
+                let download = PreviewDownload()
+                state = .downloading(download)
 
-                try await Task.sleep(nanoseconds: 0.5.seconds)
-                progress.completedUnitCount = 2
+                try await download.result()
 
                 state = .available(URL(filePath: "/tmp"))
             } catch {
+                state = .unavailable
             }
         }
     }
