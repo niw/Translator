@@ -12,12 +12,6 @@ private enum Error: Swift.Error {
     case failed(reason: String)
 }
 
-private extension Double {
-    var seconds: UInt64 {
-        UInt64(self * 1_000_000_000)
-    }
-}
-
 private final class Box<T> {
     var value: T
 
@@ -231,7 +225,7 @@ public final class TranslatorService: TranslatorServiceProtocol {
             }
 
             if debounce {
-                try await Task.sleep(nanoseconds: 1.0.seconds)
+                try await Task.sleep(for: .seconds(1.0))
             }
 
             guard let llamaModel = try await model.llamaModel else {
@@ -318,7 +312,7 @@ public final class PreviewTranslatorService: TranslatorServiceProtocol {
         do {
             isTranslating = true
             translatedString = ""
-            try await Task.sleep(nanoseconds: 1.seconds)
+            try await Task.sleep(for: .seconds(1.0))
             translatedString = "Translated from \(inputString)"
         } catch {
         }

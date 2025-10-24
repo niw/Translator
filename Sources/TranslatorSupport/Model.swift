@@ -9,12 +9,6 @@ import Foundation
 import Observation
 import LlamaModel
 
-private extension Double {
-    var seconds: UInt64 {
-        UInt64(self * 1_000_000_000)
-    }
-}
-
 public enum ModelState {
     case unavailable
     case downloading((any DownloadProtocol)?)
@@ -181,7 +175,7 @@ public final class PreviewModel: ModelProtocol {
             do {
                 state = .downloading(nil)
 
-                try await Task.sleep(nanoseconds: 0.3.seconds)
+                try await Task.sleep(for: .seconds(0.3))
 
                 let download = PreviewDownload()
                 state = .downloading(download)
